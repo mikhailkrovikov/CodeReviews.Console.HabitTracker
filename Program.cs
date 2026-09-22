@@ -1,4 +1,6 @@
-﻿namespace Habit.Tracker;
+﻿using Microsoft.Data.Sqlite;
+
+namespace Habit.Tracker;
 
 public class Program
 {
@@ -7,9 +9,17 @@ public class Program
         var dataprovider = new SQLiteDataProvider();
         var consoleUI = new ConsoleUserInterface();
 
-        dataprovider.CreateDatabase();
-        consoleUI.GoToMainMenu();
 
+        consoleUI.GoToMainMenu();
+        try
+        {
+            dataprovider.CreateDatabase();
+        }
+        catch (SqliteException)
+        {
+            consoleUI.PrintError("Error occures with database");
+            consoleUI.GoToMainMenu();
+        }
         while (true)
         {
             try
@@ -61,6 +71,16 @@ public class Program
             catch (ArgumentException ex)
             {
                 consoleUI.PrintError(ex.Message);
+                consoleUI.GoToMainMenu();
+            }
+            catch (SqliteException)
+            {
+                consoleUI.PrintError("Error occures with database");
+                consoleUI.GoToMainMenu();
+            }
+            catch (Exception)
+            {
+                consoleUI.PrintError("Unknow error occures");
                 consoleUI.GoToMainMenu();
             }
         }
